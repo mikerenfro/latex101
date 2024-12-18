@@ -1,19 +1,26 @@
-\documentclass[]{beamer}
+\documentclass[aspectratio=169]{beamer}
 %%\documentclass[notes]{beamer}
-\usepackage{etex}
-\usepackage[default]{sourcesanspro}
-
+%\usepackage{etex}
+%\usepackage[default]{sourcesanspro}
+\usetheme{Cookeville}
 
 %% Default will be false for \handouts; it can be set to true within
 %% the Makefile.
 
 \newcommand{\adv}{{\tiny (Advanced)}}
 
-\usepackage{showexpl,xspace}
+\usepackage{showexpl}
+\lstset{basicstyle=\ttfamily\small,commentstyle=\ttfamily}
+\usepackage{xspace}
 \usepackage{ifthen}
 \usepackage{amsmath}
 \usepackage{xspace}
 \usepackage{xskak}
+\usepackage{siunitx}
+\usepackage{cleveref}
+\usepackage{booktabs}
+
+\setbeamertemplate{caption}[numbered]
 
 \providecommand*{\latex}{\LaTeX\xspace}
 
@@ -60,23 +67,22 @@
   \nolimits^{#1}\gobblespace}
 \makeatother
 
-
 %%http://tex.stackexchange.com/questions/249437/redefine-latex-command
-\makeatletter
-\renewcommand{\LaTeX}{L\kern -.20em{\sbox \z@ T\vbox to\ht \z@ {\hbox {\check@mathfonts \fontsize \sf@size \z@ \math@fontsfalse \selectfont A}\vss }}\kern -.10em\TeX}
-\makeatother
+%\makeatletter
+%\renewcommand{\LaTeX}{L\kern -.20em{\sbox \z@ T\vbox to\ht \z@ {\hbox {\check@mathfonts \fontsize \sf@size \z@ \math@fontsfalse \selectfont A}\vss }}\kern -.10em\TeX}
+%\makeatother
 
 %% This snippet is from the TeX faq and allows us to use \maxwidth
 %% for the max size of an image.
-\makeatletter
-\def\maxwidth{%
-  \ifdim\Gin@nat@width>\linewidth
-  \linewidth
-  \else
-  \Gin@nat@width
-  \fi
-}
-\makeatother
+%\makeatletter
+%\def\maxwidth{%
+%  \ifdim\Gin@nat@width>\linewidth
+%  \linewidth
+%  \else
+%  \Gin@nat@width
+%  \fi
+%}
+%\makeatother
 \usepackage[overlay]{textpos}
 
 \mode<presentation>
@@ -100,16 +106,13 @@
 
 
 \title{\LaTeX\ 101}
-\author{Stephen J. Eglen}
+\subtitle{largely stolen from Stephen J. Eglen}
+\author{Mike Renfro}
 
 
-\institute{Cambridge Computational Biology Institute\\
-  Department of Applied Mathematics and Theoretical Physics\\
-  University of Cambridge\\
-  \url{http://github.com/sje30/latex101}
-}
+\institute{Information Technology Services}
 
-\date{October 2020}
+\date{October 2023}
 
 \begin{document}
 
@@ -122,6 +125,7 @@
   \begin{itemize}
   \item Typesetting, not WYSIWYG.
   \item Given a source file (file.tex) you \textbf{compile} your document (file.pdf).
+  \item Think of it like programming a document.
   \item Heavily used by mathematicians/scientists/publishers for
     formatting papers/books.
   \item Logical markup of your document (like HTML) rather than
@@ -130,27 +134,15 @@
 
   \item These slides are written in \latex using the ``beamer'' package.
 
-  \item You can typeset music, wiring diagrams, chess \ldots
+  \item You can typeset music, wiring diagrams, \ldots
 
   \end{itemize}
 \end{frame}
 
 \begin{frame}[fragile]
-  %% \frametitle{Chess}
-  %% This uses the xskak package.  "skak" is "chess" in Danish.
-  %% Example taken from http://mirror.ox.ac.uk/sites/ctan.org/macros/latex/contrib/xskak/xskak.pdf
-  \begin{LTXexample}[pos=b,rframe={}]
-    \newchessgame  % from the xskak package
-    \mainline{1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 4. Ba4 Nf6}
-    \chessboard
-  \end{LTXexample}
-\end{frame}
-
-
-\begin{frame}[fragile]
   \frametitle{``Hello world'' example}
 
-  \section*{hi there}
+%  \section*{hi there}
   \begin{LTXexample}[pos=b,rframe={}]
 \documentclass{article}
 \begin{document}
@@ -180,17 +172,16 @@
   \frametitle{Getting started}
 
   \begin{itemize}
-  \item   \latex is free to download.  \url{https://www.latex-tutorial.com/installation/}
+  \item   \latex is free to download.  \url{https://tug.org/texlive/} for Windows and Linux, \url{https://www.tug.org/mactex/} for macOS.
 
   \item  Can use it from the command line.
 
   \item  Lots of editors/GUIs available.
 
-  \item I suggest trying \textit{texstudio} or \textit{texmaker}.
-    They both handle all the compilation steps for you and provides
-    easy way of forward/inverse searching (Ctrl + left mouse button).
+  \item I suggest trying \textit{TeXShop} on macOS or \textit{TeXworks} on Windows or Linux.
+    They both handle all the compilation steps for you and provide an
+    easy way of forward/inverse searching.
 
-  \item \url{http://www.lyx.org} = latex engine + WYSIWYG interface.
   \end{itemize}
 
 \end{frame}
@@ -204,14 +195,15 @@
   \item   Ignore that; we typically create .pdf files now, via
     'pdflatex'.
   \item   Create your figures in .pdf or .eps wherever you can, else
-    png/jpg.
+    .png, or .jpg as a last resort (converting .jpg to anoth4er format won't help).
 
-  \item Matlab users: .eps files have tight bounding boxes, whereas
+  \item Matlab users: .eps files have tight margins, whereas
     pdf files do not.  However, pdflatex will silently convert \url{sin.eps} to
     \url{sin-eps-converted-to.pdf} for you:
     \begin{verbatim}
-    \fbox{\includegraphics[width=6cm]{sin.eps}}
+    \includegraphics[width=\textwidth]{sin.eps}
     \end{verbatim}
+  \item Also, avoid blindly copying/pasting/reusing code from others. It's often outdated, but you'll usually find a good answer at \url{https://tex.stackexchange.com/}.
   \end{enumerate}
 \end{frame}
 
@@ -220,7 +212,7 @@
   \frametitle{Online tools (good for collaboration)}
 
   \begin{itemize}
-  \item \url{www.overleaf.com}  (Demo)
+  \item \url{www.overleaf.com} (Mike has lots of reservations about this one)
   \item \url{www.authorea.com}
   \end{itemize}
 \end{frame}
@@ -242,8 +234,8 @@
       \end{LTXexample}
     \item You can sometimes drop \{ and \}:
       \begin{LTXexample}[pos=b]
-        e.g. if superscript is one character: compare $x^3$ with
-        $x^{19}$ and with $x^19$.
+        e.g. if superscript is one character: compare \(x^3\) with
+        \(x^{19}\) and with \(x^19\).
 
       \end{LTXexample}
   \end{itemize}
@@ -253,7 +245,7 @@
 \begin{frame}[fragile]
   \frametitle{Special characters}
 
-Some characters are commands.  To type these characters, you normally
+Some characters are commands.\label{special-chars} To type these characters, you normally
 escape them:
 \begin{LTXexample}[pos=b]
   I got a 30\% discount, saving me a few \$\$\$ \ldots
@@ -274,12 +266,12 @@ The most common characters that need escaping are:
 Multiple   spaces   between words are treated as 
 one space.  
 
-Blank lines denote
-paragraph separators.
+Blank lines denote paragraph separators.
 
-Use a non-breaking space, like 3~mm, to prevent line breaks.  Even
-better for separating numbers from units, try a small non-breaking
+Use a non-breaking space, like 3~mm, to prevent line breaks.
+Better for separating numbers from units, try a small non-breaking
 space, e.g. 3\,mm.
+Best is using the the \SI{3}{\milli\meter} command from the siunitx package.
   \end{LTXexample}
 \end{frame}
 
@@ -313,9 +305,9 @@ functionality.  They can be nested.
 
   \begin{enumerate}
   \item \latex normally is in text mode.  You must switch to math mode
-    using \$ to get into and out of math.
+    using \verb+\(+ and \verb+\)+ to get into and out of math.
 \begin{LTXexample}[pos=b]
-  This equation $x^2 + y^2 = z^2$ is in-line; compare with:
+  This equation \(x^2 + y^2 = z^2\) is in-line; compare with:
   \begin{align}
     I_1 &= \int_0^{2 \pi} \sin (x^2) dx \nonumber \\
     \text{but}\, I_2 &= \int_0^{2 \pi} \cos (x^2) dx \label{key}
@@ -346,12 +338,12 @@ functionality.  They can be nested.
   \frametitle{Universe of mathematics symbols and operators}
 
 
-  \url{http://mirror.ox.ac.uk/sites/ctan.org/info/symbols/comprehensive/symbols-a4.pdf}
+  \url{https://tug.ctan.org/info/symbols/comprehensive/symbols-a4.pdf}
 
   contains $\sim$6000 symbols and \latex commands to
   generate them.  e.g. see Table 97 for inequalities:
 
-  \centerline{\includegraphics[width=9cm]{table97-a4symbols.png}}
+  \centerline{\includegraphics[width=8cm]{table97-a4symbols.png}}
 
 
 \end{frame}
@@ -360,14 +352,8 @@ functionality.  They can be nested.
   \frametitle{Finding maths operators the ``modern'' way}
 
   \begin{itemize}
-  \item Draw some equations and it will try to render it in latex or
-    mathml:
-
-    Wolfram: graph an equation, with latex output.
-    \url{http://webdemo.myscript.com/\#/demo/equation}
-    %% needed to escape hash
-
-  \item \url{http://detexify.kirelabs.org/classify.html}
+  \item Draw some symbols and it will find the code for it:
+  \url{http://detexify.kirelabs.org/classify.html}
 
 
 
@@ -383,8 +369,7 @@ functionality.  They can be nested.
 
 
   \begin{LTXexample}[pos=b]
-    \newcommand{\betaIIKO}
-    {\ensuremath{\beta\mathit{2}^{-/-}}\xspace}
+    \newcommand{\betaIIKO}{\ensuremath{\beta\mathit{2}^{-/-}}\xspace}
     The \betaIIKO mouse is widely studied \ldots 
     the \betaIIKO command  is easier for me
     to type than the whole expansion.
@@ -419,16 +404,13 @@ Entries like the following are stored in a bibliography file:
 
 which you can then cite using e.g.
 \begin{verbatim}
-We used the R programming environment \cite{ihaka1996}
-for our analysis.
+We used the R programming environment \cite{ihaka1996}.
 \end{verbatim}
 
 To create:
 
-
 \begin{verbatim}
-We used the R programming environment (Ihaka and Gentleman, 
-1996) for our analysis.
+We used the R programming environment (Ihaka and Gentleman, 1996).
 \end{verbatim}
 
 and references at end.  See \url{texintro/intro.tex}
@@ -448,7 +430,7 @@ for more info.
     configure google scholar).
   \item zotero/paperpile/mendeley all generate good bibtex
     entries.
-    
+  \item Journals are hit and miss. Lots of them don't pay attention to the special characters back on slide \pageref{special-chars}.
   \end{itemize}
 
 
@@ -461,17 +443,21 @@ for more info.
   \frametitle{Preamble}
 
   \begin{enumerate}
-  \item Everything before the \verb+begin{document}+ is the preamble.
-  \item Use it to set up document, load packages.  My favourite
-    packages:
+  \item Everything before the \verb+\begin{document}+ is the preamble.
+  \item Use it to set up document, load packages. Examples:
 
 
 \begin{verbatim}
-\usepackage{graphicx}           % Including graphics.
-\usepackage{url}                % active URLs.
-\usepackage[a4paper,margin=2cm]{geometry}
-\usepackage{mathpazo}           % or mathptmx
-\usepackage{amsmath}            % AMS Maths goodies
+\usepackage{nomencl}                    % nomenclature/list of symbols
+\usepackage{graphicx}                   % Including graphics.
+\usepackage{hyperref}                   % hyperlinks and URLs.
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage{amsmath}                    % most math notation
+\usepackage{booktabs}                   % publication-quality tables
+\usepackage[binary-units=true]{siunitx} % values with or without units
+\sisetup{group-separator=,range-units=single}
+  \DeclareSIUnit\MPa{\mega\Pascal}
+\usepackage{cleveref}                   % more automatic references
 \end{verbatim}
   \end{enumerate}
 \end{frame}
@@ -484,7 +470,6 @@ for more info.
 
   \begin{enumerate}
   \item Do nothing.  Stick with Donald Knuth's \textit{Computer Modern}.  
-  \item I prefer mathpazo (Palatino) or mathptmx (Times).
   \item Explore the free guide \url{http://mirrors.ctan.org/info/Free_Math_Font_Survey/en/survey.html}
   \end{enumerate}
 \end{frame}
@@ -512,13 +497,14 @@ for more info.
   \begin{LTXexample}[pos=b,rframe={}]
 \begin{table}
   \centering
-  \begin{tabular}{|l|rr|}  \hline
-    year & min temp (C) & max temp (C)\\ \hline
-    1970 & -5 & 35\\
-    1980 & -3 & 30\\
-    1985 & -2 & 32\\ \hline
+  \begin{tabular}{l
+    S[table-number-alignment = right]
+    S[table-number-alignment = right]}  \toprule
+    year & {min temp (\si{\degreeCelsius})} & {max temp (\si{\degreeCelsius})} \\
+    \midrule
+    1985 & -2 & 32 \\ \bottomrule
   \end{tabular}
-  \caption{Fictional min/max temperatures.} \label{tab:simple}
+  \caption{\label{tab:simple} Fictional min/max temperatures.}
 \end{table}
   \end{LTXexample}
 \end{frame}
@@ -528,10 +514,10 @@ for more info.
   \frametitle{Labels and references}
   \label{labels}
   \begin{enumerate}
-  \item For complex documents, rather than writing ``Table 3'', it is
+  \item For complex documents, rather than writing ``\Cref{tab:simple}'', it is
     better to give the Table a label using \verb+\label{tab:simple}+,
     and then refer to that label, using e.g.
-    \verb+See Table~\ref{tab:simple}+.
+    \verb+See \Cref{tab:simple}+.
 
       \item You can also refer to figures, equations, sections in a
         similar way.  
@@ -549,9 +535,8 @@ for more info.
   \begin{LTXexample}[pos=b,rframe={}]
 \begin{figure}
   \centering
-  \fbox{\includegraphics[width=4cm]{sigmoid}}
-  \caption{Example of a sigmoidal curve.}
-  \label{fig:example}
+  \includegraphics[width=4cm]{sigmoid}
+  \caption{\label{fig:example} Example of a sigmoidal curve.}
 \end{figure}
   \end{LTXexample}
 
